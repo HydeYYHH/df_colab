@@ -132,11 +132,14 @@ def start() -> None:
                       
     # process image to directory
     if os.path.isdir(roop.globals.target_path):
+        if not os.path.isdir(roop.globals.output_path):
+          os.makedirs(roop.globals.output_path)
         for index, frame_name in enumerate(os.listdir(roop.globals.target_path)):
-            shutil.copy2(os.path.join(roop.globals.target_path, frame_name), os.path.join(roop.globals.output_path, f"{index:04d}.png"))
+            shutil.copy2(os.path.join(roop.globals.target_path, frame_name), os.path.join(roop.globals.output_path, f"{index+1:04d}.png"))
         for frame_processor in get_frame_processors_modules(roop.globals.frame_processors):
             update_status('Progressing...', frame_processor.NAME)
             imgs = list(map(lambda i: os.path.join(roop.globals.output_path, i), [i for i in os.listdir(roop.globals.output_path)]))
+            print(imgs)
             frame_processor.process_video(roop.globals.source_path, imgs) 
             frame_processor.post_process()
             
