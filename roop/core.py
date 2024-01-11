@@ -129,16 +129,15 @@ def update_status(message: str, scope: str = 'ROOP.CORE') -> None:
 
 
 def start() -> None:
-    for frame_processor in get_frame_processors_modules(roop.globals.frame_processors):
-        if not frame_processor.pre_start():
-            return
-        
+                      
     # process image to directory
     if os.path.isdir(roop.globals.target_path):
-        shutil.copytree(roop.globals.target_path, roop.globals.output_path)
+        for index, frame_name in enumerate(os.listdir(roop.globals.target_path)):
+            shutil.copy2(os.path.join(roop.globals.target_path, frame_name), os.path.join(roop.globals.output_path, f"{index:04d}.png"))
         for frame_processor in get_frame_processors_modules(roop.globals.frame_processors):
             update_status('Progressing...', frame_processor.NAME)
-            frame_processor.process_video(roop.globals.source_path, roop.globals.output_path)
+            imgs = list(map(lambda i: os.path.join(roop.globals.output_path, i), [i for i in os.listdir(roop.globals.output_path)]))
+            frame_processor.process_video(roop.globals.source_path, imgs) 
             frame_processor.post_process()
             
             
